@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -26,6 +27,15 @@ type freePlacesResponce struct {
 type parkingLot struct {
 	capacity    int
 	takenPlaces map[string]int
+	commander   commander
+}
+
+func newParkingLot(capacity int, commander commander) *parkingLot {
+	return &parkingLot{
+		capacity:    capacity,
+		takenPlaces: make(map[string]int, capacity),
+		commander:   commander,
+	}
 }
 
 func (pl parkingLot) getFreePlaces() int {
@@ -103,7 +113,19 @@ func main() {
 	commonLog, err := os.OpenFile(commonLogPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	checkErr(err)
 	log.SetOutput(commonLog)
-	ps := newParkingServer(parkingLot{capacity: 15, takenPlaces: make(map[string]int, 15)})
+	bitrate, err := strconv.ParseUint(os.Getenv("bitrate"), 10, 32)
+	timeout, err := strconv.ParseUint(os.Getenv("timeout"), 10, 32)
+	checkErr(err)
+	ps := newParkingServer(
+		*newParkingLot(
+			15,
+			*newCommander(
+				os.Getenv("comportDevice"),
+				uint(bitrate),
+				uint(timeout),
+			),
+		),
+	)
 	router := gin.Default()
 	router.GET("/parkingLot", ps.getFreePlaces)
 	router.GET("/parkingLot/:code", ps.getCar)
