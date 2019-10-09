@@ -76,12 +76,11 @@ func (ps *parkingServer) getFreePlaces(c *gin.Context) {
 func (ps *parkingServer) getCar(c *gin.Context) {
 	code := c.Param("code")
 	err := ps.parkingLot.getCar(code)
-	var empty struct{}
 	statusCode := http.StatusAccepted
 	if err != nil {
 		statusCode = http.StatusNotFound
 	}
-	c.JSON(statusCode, empty)
+	c.String(statusCode, "")
 }
 
 func (ps *parkingServer) placeCar(c *gin.Context) {
