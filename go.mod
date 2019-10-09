@@ -1,4 +1,4 @@
-module github.com/4tyTwo/parking_project
+module github.com/4tyTwo/parking
 
 go 1.13
 
