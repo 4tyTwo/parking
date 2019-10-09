@@ -95,12 +95,12 @@ func (ps *parkingServer) placeCar(c *gin.Context) {
 func main() {
 	err := godotenv.Load("parking.env")
 	checkErr(err)
-
-	accessLog, err := os.OpenFile("access.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	accessLogPath := os.Getenv("accessLogPath")
+	accessLog, err := os.OpenFile(accessLogPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	checkErr(err)
 	gin.DefaultWriter = io.MultiWriter(accessLog)
-
-	commonLog, err := os.OpenFile("common.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	commonLogPath := os.Getenv("commonLogPath")
+	commonLog, err := os.OpenFile(commonLogPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	checkErr(err)
 	log.SetOutput(commonLog)
 	ps := newParkingServer(parkingLot{capacity: 15, takenPlaces: make(map[string]int, 15)})
