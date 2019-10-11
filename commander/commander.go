@@ -19,8 +19,8 @@ func New(device string, bitrate, timeout uint) *Commander {
 	opts := serial.OpenOptions{
 		PortName:              device,
 		BaudRate:              bitrate,
-		DataBits:              8,
-		StopBits:              1,
+		DataBits:              8,       // TODO: configure
+		StopBits:              1,       // TODO: configure
 		InterCharacterTimeout: timeout, //ms
 	}
 	port, err := serial.Open(opts)
