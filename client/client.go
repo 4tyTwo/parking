@@ -65,6 +65,9 @@ func GetCar(host, code string) error {
 	if resp.StatusCode == 202 {
 		return nil
 	}
+	if resp.StatusCode == 404 {
+		return errors.New("No car found")
+	}
 	if resp.StatusCode == 500 {
 		return errors.New("Server Failed")
 	}
