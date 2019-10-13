@@ -43,5 +43,5 @@ func main() {
 	router.GET("/parkingLot", ps.GetFreePlaces)
 	router.GET("/parkingLot/:code", ps.GetCar)
 	router.POST("/parkingLot", ps.PlaceCar)
-	router.Run(":8080")
+	router.Run(os.Getenv("serverPort"))
 }
