@@ -2,6 +2,7 @@ package lot
 
 import (
 	"errors"
+	"strconv"
 	"strings"
 
 	"github.com/4tyTwo/parking/commander"
@@ -31,11 +32,13 @@ func (pl ParkingLot) GetFreePlaces() int {
 
 // GetCar proceeds car retrieval procedure if there is a car assosiated with given code
 func (pl *ParkingLot) GetCar(code string) error {
-	if _, exists := pl.takenPlaces[code]; !exists {
+	n, exists := pl.takenPlaces[code]
+	if !exists {
 		return errors.New("Not Found")
 	}
 	delete(pl.takenPlaces, code)
-	// TODO actually get it
+	err := pl.commander.WriteCommand("get " + strconv.Itoa(n) + "\n") // Stringbuilder perhaps?
+	utils.CheckErr(err)
 	return nil
 }
 
@@ -46,7 +49,10 @@ func (pl *ParkingLot) PlaceCar() (string, error) {
 		return "", errors.New("Parking Lot is Full")
 	}
 	code := pl.generateCode()
-	pl.takenPlaces[code] = pl.capacity - freePlaces
+	place := pl.capacity - freePlaces
+	err := pl.commander.WriteCommand("put " + strconv.Itoa(place) + "\n") // Stringbuilder perhaps?
+	utils.CheckErr(err)
+	pl.takenPlaces[code] = place
 	return code, nil
 }
 

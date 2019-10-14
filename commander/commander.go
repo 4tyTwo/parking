@@ -2,6 +2,7 @@ package commander
 
 import (
 	"io"
+	"log"
 
 	"github.com/4tyTwo/parking/utils"
 
@@ -19,9 +20,10 @@ func New(device string, bitrate, timeout uint) *Commander {
 	opts := serial.OpenOptions{
 		PortName:              device,
 		BaudRate:              bitrate,
-		DataBits:              8,       // TODO: configure
-		StopBits:              1,       // TODO: configure
-		InterCharacterTimeout: timeout, //ms
+		DataBits:              8,
+		StopBits:              1,
+		MinimumReadSize:       4,
+		InterCharacterTimeout: 200,
 	}
 	port, err := serial.Open(opts)
 	utils.CheckErr(err)
@@ -31,8 +33,19 @@ func New(device string, bitrate, timeout uint) *Commander {
 	}
 }
 
-func (comm *Commander) writeCommand(command string) error {
+func (comm *Commander) WriteCommand(command string) error {
 	bytes := []byte(command)
-	_, err := comm.device.Write(bytes)
+	n, err := comm.device.Write(bytes)
+	if n != len(bytes) {
+		log.Fatal("Wrote wrong number of bytes")
+	}
+	resp := make([]byte, 10)
+	n, err = comm.device.Read(resp)
+	if err != nil {
+		log.Fatalf("port.Read: %v", err)
+	}
+	if string(resp[:n]) != "OK\r\n" {
+		log.Fatal("Device responded with not OK")
+	}
 	return err
 }
