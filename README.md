@@ -65,3 +65,6 @@ Content-Length: 2
 
 {}
 ```
+
+## Api client
+Для данной системы доступен также [клиент командной линии](https://github.com/4tyTwo/parking-client)
